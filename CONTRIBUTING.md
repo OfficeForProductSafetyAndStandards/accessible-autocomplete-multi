@@ -4,13 +4,15 @@ Contributions welcome, please raise a pull request.
 
 ## Requirements
 
-You will need a recent version of Node and npm installed:
+You will need a recent version of Node, npm and yarn installed:
 
 ```bash
 $ node -v
-v18.15.0
+18.15.0
 $ npm -v
-v9.5.0
+9.5.0
+$ yarn -v
+1.22.19
 ```
 
 If you want to run the selenium tests, you will also need a local copy of the Java Development Kit:
@@ -69,20 +71,6 @@ npm run karma:dev
 ```
 
 To run the integration tests locally with Chrome (specified in [wdio.config.js](test/wdio.config.js)):
-
-```bash
-npm run wdio
-```
-
-To run the integration tests on [Sauce Labs](https://saucelabs.com/), create a `.env` file with the following:
-
-```bash
-SAUCE_ENABLED="true"
-SAUCE_USERNAME="XXXXXXXX"
-SAUCE_ACCESS_KEY="YYYYYYYY"
-```
-
-And run the same command:
 
 ```bash
 npm run wdio
