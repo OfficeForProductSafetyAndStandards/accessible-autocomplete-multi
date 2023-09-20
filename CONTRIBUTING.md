@@ -2,17 +2,15 @@
 
 Contributions welcome, please raise a pull request.
 
-If you want to help and want to get more familiar with the codebase, try starting with the ["good for beginners"](https://github.com/alphagov/accessible-autocomplete/issues?q=is%3Aissue+is%3Aopen+label%3A%22good+for+beginners%22) issues. Feel free to request more guidance in the issue comments.
-
 ## Requirements
 
 You will need a recent version of Node and npm installed:
 
 ```bash
 $ node -v
-v7.10.0
+v18.15.0
 $ npm -v
-v5.0.0
+v9.5.0
 ```
 
 If you want to run the selenium tests, you will also need a local copy of the Java Development Kit:
@@ -150,20 +148,3 @@ Create a pull request for the release and merge once it has been approved, then 
 git checkout main
 git pull --rebase
 ```
-
-### Publish the release
-
-  1. Sign in to npm (`npm login`) as `govuk-patterns-and-tools` using the credentials from BitWarden.
-  2. Run `npm publish` to publish to npm.
-  3. Open the ['create a new release' dialog](https://github.com/alphagov/accessible-autocomplete/releases/new) on GitHub.
-  4. Select the latest tag version.
-  5. Set 'v[VERSION-NUMBER]' as the title.
-  6. Add the release notes from the changelog.
-  7. Add a summary of highlights.
-  8. Select **Publish release**.
-
-You do not need to manually attach source code files to the release on GitHub.
-
-Post a short summary of the release in the cross-government and GDS #govuk-design-system Slack channels. For example:
-
-🚀 We’ve just released Accessible Autocomplete v2.0.1. You can now use the acccessible autocomplete multiple times on one page. Thanks to @<SLACK-NAME> and @<SLACK-NAME> for helping with this release. [https://github.com/alphagov/accessible-autocomplete/releases/tag/v2.0.1](https://github.com/alphagov/accessible-autocomplete/releases/tag/v2.0.1)

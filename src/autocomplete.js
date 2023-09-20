@@ -44,11 +44,15 @@ export default class Autocomplete extends Component {
     name: 'input-autocomplete',
     placeholder: '',
     onConfirm: () => {},
+    onDelete: () => {},
     confirmOnBlur: true,
     showNoOptionsFound: true,
     showAllValues: false,
     required: false,
+    multiple: false,
+    selectedOptions: [],
     tNoResults: () => 'No results found',
+    tSelectedOptionDescription: () => 'Press Enter or Space to remove selection',
     tAssistiveHint: () => 'When autocomplete results are available use up and down arrows to review and enter to select.  Touch device users, explore by touch or with swipe gestures.',
     dropdownArrow: DropdownArrowDown
   }
@@ -63,6 +67,7 @@ export default class Autocomplete extends Component {
       hovered: null,
       menuOpen: false,
       options: props.defaultValue ? [props.defaultValue] : [],
+      selectedOptions: props.selectedOptions,
       query: props.defaultValue,
       validChoiceMade: false,
       selected: null,
@@ -83,6 +88,8 @@ export default class Autocomplete extends Component {
     this.handleOptionFocus = this.handleOptionFocus.bind(this)
     this.handleOptionMouseDown = this.handleOptionMouseDown.bind(this)
     this.handleOptionMouseEnter = this.handleOptionMouseEnter.bind(this)
+
+    this.handleRemoveSelectedOptionClick = this.handleRemoveSelectedOptionClick.bind(this)
 
     this.handleInputBlur = this.handleInputBlur.bind(this)
     this.handleInputChange = this.handleInputChange.bind(this)
@@ -157,6 +164,16 @@ export default class Autocomplete extends Component {
     return suggestionTemplate ? suggestionTemplate(value) : value
   }
 
+  resetInput () {
+    this.setState({
+      focused: null,
+      menuOpen: false,
+      query: '',
+      selected: null,
+      validChoiceMade: false
+    })
+  }
+
   handleComponentBlur (newState) {
     const { options, query, selected } = this.state
     let newQuery
@@ -166,13 +183,18 @@ export default class Autocomplete extends Component {
     } else {
       newQuery = query
     }
-    this.setState({
-      focused: null,
-      menuOpen: newState.menuOpen || false,
-      query: newQuery,
-      selected: null,
-      validChoiceMade: this.isQueryAnOption(newQuery, options)
-    })
+
+    if (this.props.multiple) {
+      this.resetInput()
+    } else {
+      this.setState({
+        focused: null,
+        menuOpen: newState.menuOpen || false,
+        query: newQuery,
+        selected: null,
+        validChoiceMade: this.isQueryAnOption(newQuery, options)
+      })
+    }
   }
 
   handleListMouseLeave (event) {
@@ -279,15 +301,37 @@ export default class Autocomplete extends Component {
     const selectedOption = this.state.options[index]
     const newQuery = this.templateInputValue(selectedOption)
     this.props.onConfirm(selectedOption)
-    this.setState({
-      focused: -1,
-      hovered: null,
-      menuOpen: false,
-      query: newQuery,
-      selected: -1,
-      validChoiceMade: true
-    })
-    this.forceUpdate()
+    if (this.props.multiple) {
+      this.resetInput()
+      if (this.state.selectedOptions.indexOf(selectedOption) === -1) {
+        this.setState({
+          selectedOptions: this.state.selectedOptions.concat([selectedOption])
+        })
+      }
+    } else {
+      this.setState({
+        focused: -1,
+        hovered: null,
+        menuOpen: false,
+        query: newQuery,
+        selected: -1,
+        validChoiceMade: true
+      })
+    }
+  }
+
+  handleRemoveSelectedOptionClick (event, index) {
+    const selectedOptions = this.state.selectedOptions
+    const toRemove = selectedOptions[index]
+    if (toRemove) {
+      const newSelectedOptions = selectedOptions.filter(o => o !== toRemove)
+
+      this.setState({
+        selectedOptions: newSelectedOptions
+      })
+
+      this.props.onRemove(toRemove)
+    }
   }
 
   handleOptionMouseDown (event) {
@@ -409,16 +453,18 @@ export default class Autocomplete extends Component {
       name,
       placeholder,
       required,
+      multiple,
       showAllValues,
       tNoResults,
       tStatusQueryTooShort,
       tStatusNoResults,
       tStatusSelectedOption,
       tStatusResults,
+      tSelectedOptionDescription,
       tAssistiveHint,
       dropdownArrow: dropdownArrowFactory
     } = this.props
-    const { focused, hovered, menuOpen, options, query, selected, ariaHint, validChoiceMade } = this.state
+    const { focused, hovered, menuOpen, options, query, selected, ariaHint, validChoiceMade, selectedOptions } = this.state
     const autoselect = this.hasAutoselect()
 
     const inputFocused = focused === -1
@@ -443,6 +489,7 @@ export default class Autocomplete extends Component {
     const menuModifierVisibility = `${menuClassName}--${(menuIsVisible) ? 'visible' : 'hidden'}`
 
     const optionClassName = `${cssNamespace}__option`
+    const selectedOptionsClassName = `${cssNamespace}__list`
 
     const hintClassName = `${cssNamespace}__hint`
     const selectedOptionText = this.templateInputValue(options[selected])
@@ -453,9 +500,11 @@ export default class Autocomplete extends Component {
       : ''
 
     const assistiveHintID = id + '__assistiveHint'
-    const ariaDescribedProp = (ariaHint) ? {
-      'aria-describedby': assistiveHintID
-    } : null
+    const ariaDescribedProp = (ariaHint)
+      ? {
+          'aria-describedby': assistiveHintID
+        }
+      : null
 
     let dropdownArrow
 
@@ -554,6 +603,32 @@ export default class Autocomplete extends Component {
             <li className={`${optionClassName} ${optionClassName}--no-results`}>{tNoResults()}</li>
           )}
         </ul>
+
+        {multiple && selectedOptions.length > 0 && (
+          <ul
+            className={`${selectedOptionsClassName}`}
+            id={`${id}__list`}
+            role='listbox'
+          >
+            {selectedOptions.map((option, index) => {
+              return (
+                <li id={`${id}__selected-option--${index}`} className='autocomplete__selected-option' key={`${index}`}>
+                  <span dangerouslySetInnerHTML={{ __html: this.templateSuggestion(option) }} />
+                  <button
+                    type='button'
+                    className='autocomplete__remove-option'
+                    aria-label={`${this.templateSuggestion(option)}, selected. ${tSelectedOptionDescription()}`}
+                    onClick={(event) => this.handleRemoveSelectedOptionClick(event, index)}
+                  >remove
+                  </button>
+                </li>
+              )
+            })}
+            {showNoOptionsFound && (
+              <li className={`${optionClassName} ${optionClassName}--no-results`}>{tNoResults()}</li>
+            )}
+          </ul>
+        )}
 
         <span id={assistiveHintID} style={{ display: 'none' }}>{tAssistiveHint()}</span>
 
