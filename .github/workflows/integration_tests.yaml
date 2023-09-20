@@ -2,9 +2,8 @@ name: Integration tests
 
 on: [push, pull_request]
 
-
 jobs:
-  test-saucelabs:
+  test:
     name: Build & test
     runs-on: ubuntu-latest
 
@@ -22,12 +21,12 @@ jobs:
           cache: 'npm'
 
       - name: Install dependencies
-        run: npm ci
+        run: |
+          npm install yarn
+          yarn install
 
       - name: Build
         run: npm run build
 
       - name: "Run integration tests"
         run: npm run wdio:test
-        env:
-          SAUCE_ENABLED: "false"  # ensure we don't use Sauce Labs
