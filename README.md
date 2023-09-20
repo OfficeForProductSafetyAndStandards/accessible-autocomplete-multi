@@ -14,6 +14,8 @@ If you're asking users to provide their country or territory, the [govuk-country
 - **User experience**: Supporting a wide variety of user needs.
 - **Compatibility**: Working with [recommended browsers](https://www.gov.uk/service-manual/technology/designing-for-different-browsers-and-devices#browsers-to-test-in) and [assistive technologies](https://www.gov.uk/service-manual/technology/testing-with-assistive-technologies#which-assistive-technologies-to-test-with).
 
+[Try out the examples!](https://officeforproductsafetyandstandards.github.io/accessible-autocomplete-multi/examples/)
+
 ---
 
 ## Support
