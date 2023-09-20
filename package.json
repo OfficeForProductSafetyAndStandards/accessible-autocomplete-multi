@@ -4,7 +4,7 @@
   "main": "dist/accessible-autocomplete.min.js",
   "style": "dist/accessible-autocomplete.min.css",
   "description": "An autocomplete component, built to be accessible.",
-  "repository": "OfficeForProductSafetyAndStandards/accessible-autocomplete",
+  "repository": "github:OfficeForProductSafetyAndStandards/accessible-autocomplete-multi",
   "author": "Government Digital Service (https://www.gov.uk/government/organisations/government-digital-service) and Office for Product Safety & Standards (https://www.gov.uk/government/organisations/office-for-product-safety-and-standards)",
   "license": "MIT",
   "keywords": [
@@ -98,5 +98,6 @@
   ],
   "standard": {
     "parser": "@babel/eslint-parser"
-  }
+  },
+  "private": true
 }
