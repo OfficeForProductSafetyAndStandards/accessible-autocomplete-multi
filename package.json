@@ -1,10 +1,13 @@
 {
-  "name": "accessible-autocomplete-multi",
+  "name": "@OfficeForProductSafetyAndStandards/accessible-autocomplete-multi",
   "version": "2.0.4",
   "main": "dist/accessible-autocomplete.min.js",
   "style": "dist/accessible-autocomplete.min.css",
   "description": "An autocomplete component, built to be accessible.",
-  "repository": "github:OfficeForProductSafetyAndStandards/accessible-autocomplete-multi",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/OfficeForProductSafetyAndStandards/accessible-autocomplete-multi.git"
+  },
   "author": "Government Digital Service (https://www.gov.uk/government/organisations/government-digital-service) and Office for Product Safety & Standards (https://www.gov.uk/government/organisations/office-for-product-safety-and-standards)",
   "license": "MIT",
   "keywords": [
@@ -99,5 +102,7 @@
   "standard": {
     "parser": "@babel/eslint-parser"
   },
-  "private": true
+  "publishConfig": {
+    "registry": "https://npm.pkg.github.com"
+  }
 }
