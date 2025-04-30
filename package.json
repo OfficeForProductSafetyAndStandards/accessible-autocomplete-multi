@@ -1,6 +1,6 @@
 {
   "name": "@OfficeForProductSafetyAndStandards/accessible-autocomplete-multi",
-  "version": "2.0.4",
+  "version": "2.0.6",
   "main": "dist/accessible-autocomplete.min.js",
   "style": "dist/accessible-autocomplete.min.css",
   "description": "An autocomplete component, built to be accessible.",
@@ -100,7 +100,11 @@
     "iOS >= 9"
   ],
   "standard": {
-    "parser": "@babel/eslint-parser"
+    "parser": "@babel/eslint-parser",
+    "ignore": [
+      "dist/**",
+      "*.min.js"
+    ]
   },
   "publishConfig": {
     "registry": "https://npm.pkg.github.com"
