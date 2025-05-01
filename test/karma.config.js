@@ -1,10 +1,11 @@
 require('@babel/register')({
   cwd: require('path').resolve(__dirname, '../')
 })
-const puppeteer = require('puppeteer')
-const webpack = require('../webpack.config.babel.js')[0]
 
-// Use Chrome headless
+const puppeteer = require('puppeteer')
+const baseWebpackConfig = require('../webpack.config.babel.js')[0]
+const webpack = require('webpack')
+
 process.env.CHROME_BIN = puppeteer.executablePath()
 
 module.exports = function (config) {
@@ -13,7 +14,14 @@ module.exports = function (config) {
     frameworks: ['mocha', 'chai-sinon'],
     reporters: ['mocha'],
 
-    browsers: ['ChromeHeadless'],
+    browsers: ['ChromeHeadlessNoSandbox'],
+
+    customLaunchers: {
+      ChromeHeadlessNoSandbox: {
+        base: 'ChromeHeadless',
+        flags: ['--no-sandbox', '--disable-gpu']
+      }
+    },
 
     files: [
       'test/functional/**/*.js'
@@ -25,7 +33,16 @@ module.exports = function (config) {
       '**/*.js': ['sourcemap']
     },
 
-    webpack,
+    webpack: {
+      ...baseWebpackConfig,
+      plugins: [
+        ...(baseWebpackConfig.plugins || []),
+        new webpack.DefinePlugin({
+          'process.env.NODE_ENV': JSON.stringify('test')
+        })
+      ]
+    },
+
     webpackMiddleware: {
       logLevel: 'error',
       stats: 'errors-only'
