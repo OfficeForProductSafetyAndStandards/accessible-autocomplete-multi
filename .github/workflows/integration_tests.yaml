@@ -1,37 +1,40 @@
 name: Integration tests
-on: [push, pull_request]
+
+on:
+  pull_request:
+
+  push:
+    branches:
+      - main
+
+  workflow_dispatch:
+
+concurrency:
+  group: integration-${{ github.head_ref || github.run_id }}
+  cancel-in-progress: true
+
 jobs:
-  test:
+  integration:
     name: Build & test
     runs-on: ubuntu-latest
+
     steps:
-      - uses: actions/checkout@v4
-      
-      - name: Setup Chrome
-        uses: browser-actions/setup-chrome@v1
+      - name: Checkout code
+        uses: actions/checkout@v4.1.7
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4.0.3
         with:
-          chrome-version: stable
-      
-      - name: Read node version from .nvmrc
-        id: nvm
-        run: echo "NVMRC=$(cat .nvmrc)" >> $GITHUB_OUTPUT
-      
-      - name: "Setup Node v${{ steps.nvm.outputs.NVMRC }}"
-        uses: actions/setup-node@v3
-        with:
-          node-version: "${{ steps.nvm.outputs.NVMRC }}"
-          cache: 'npm'
-      
+          cache: npm
+          node-version-file: .nvmrc
+
       - name: Install dependencies
-        run: |
-          npm install yarn
-          yarn install
-      
+        run: npm ci
+
       - name: Build
         run: npm run build
-      
-      - name: "Run integration tests"
-        run: npm run wdio:test
+
+      - name: Run browser tests (without Sauce Labs)
+        run: npm run wdio
         env:
-          CI: true
-          HEADLESS: true
+          SAUCE_ENABLED: false

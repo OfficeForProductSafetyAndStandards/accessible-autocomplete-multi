@@ -1,110 +1,123 @@
-/* global browser, browserVersion */
 require('dotenv').config()
-const staticServerPort = process.env.PORT || 4567
+require('@babel/register')({
+  rootMode: 'upward'
+})
 
-// Detect if running in CI environment
-const isCI = Boolean(process.env.CI)
-const useHeadless = Boolean(process.env.HEADLESS || isCI)
+const { join } = require('path')
+const { cwd } = require('process')
+const puppeteer = require('puppeteer')
 
-// Adjust timeouts based on environment
-const timeoutMultiplier = isCI ? 3 : 1
+const {
+  PORT = 4567,
+  SAUCE_ACCESS_KEY,
+  SAUCE_BUILD_NUMBER,
+  SAUCE_ENABLED,
+  SAUCE_USERNAME
+} = process.env
 
-exports.config = {
-  runner: 'local',
-
-  specs: [
-    './integration/**/*.js'
-  ],
-  exclude: [
-    // 'path/to/excluded/files'
-  ],
-
-  // Reduce parallel instances in CI to prevent resource contention
-  maxInstances: isCI
-    ? 1
-    : 10,
-
-  capabilities: [{
+/**
+ * Browsers for local tests
+ *
+ * @type {RemoteCapabilities}
+ */
+const capabilitiesLocal = [
+  {
     browserName: 'chrome',
     'goog:chromeOptions': {
-      // Add headless and other options for CI environments
-      args: useHeadless
-        ? [
-            '--headless',
-            '--disable-gpu',
-            '--no-sandbox',
-            '--disable-dev-shm-usage',
-            '--window-size=1920,1080'
-          ]
-        : []
+      args: ['--headless=new'],
+      binary: puppeteer.executablePath()
     }
-  }],
+  }
+]
 
-  logLevel: process.env.WDIO_LOG_LEVEL || 'info',
+/**
+ * Browsers for Sauce Labs tests
+ *
+ * @type {RemoteCapabilities}
+ */
+const capabilitiesSauce = [
+  {
+    browserName: 'chrome',
+    browserVersion: 'latest',
+    platformName: 'Windows 10',
+    'sauce:options': {
+      build: SAUCE_BUILD_NUMBER
+    }
+  },
+  {
+    browserName: 'firefox',
+    browserVersion: '55',
+    platformName: 'Windows 10',
+    'sauce:options': {
+      build: SAUCE_BUILD_NUMBER
+    }
+  },
+  {
+    browserName: 'internet explorer',
+    browserVersion: 'latest',
+    platformName: 'Windows 10',
+    'sauce:options': {
+      build: SAUCE_BUILD_NUMBER
+    }
+  }
+]
 
-  bail: 0,
-  baseUrl: 'http://localhost:' + staticServerPort,
+/**
+ * WebdriverIO config
+ *
+ * @type {Testrunner}
+ */
+exports.config = {
+  user: SAUCE_USERNAME,
+  key: SAUCE_ACCESS_KEY,
 
-  // Increase timeouts for CI environment
-  waitforTimeout: 10000 * timeoutMultiplier,
-  connectionRetryTimeout: 120000 * timeoutMultiplier,
-  connectionRetryCount: isCI ? 5 : 3,
+  // Use DevTools prototype for Puppeteer
+  automationProtocol: SAUCE_ENABLED === 'true'
+    ? 'webdriver'
+    : 'devtools',
+
+  baseUrl: `http://localhost:${PORT}`,
+
+  capabilities: SAUCE_ENABLED === 'true'
+    ? capabilitiesSauce
+    : capabilitiesLocal,
 
   framework: 'mocha',
-
+  outputDir: join(cwd(), 'logs'),
   reporters: ['spec'],
 
-  mochaOpts: {
-    ui: 'bdd',
-    // Increase Mocha timeout for CI
-    timeout: 60000 * timeoutMultiplier
-  },
-
-  outputDir: './logs/',
-  screenshotPath: './screenshots/',
-
   services: [
+    /**
+     * Web server options
+     *
+     * @type {[string, StaticServerOptions]}
+     */
     ['static-server', {
       folders: [
-        { mount: '/', path: './examples' },
-        { mount: '/dist/', path: './dist' }
+        { mount: '/', path: join(cwd(), 'examples') },
+        { mount: '/dist/', path: join(cwd(), 'dist') }
       ],
-      port: staticServerPort
+      port: PORT
+    }],
+
+    /**
+     * Browser testing options
+     *
+     * @type {[string, SauceServiceConfig]}
+     */
+    ['sauce', {
+      // Optionally connect to Sauce Labs
+      sauceConnect: SAUCE_ENABLED === 'true'
     }]
   ],
 
-  // Hook to take screenshots on test failure
-  afterTest: async function (test, context, { error, result, duration, passed, retries }) {
-    if (!passed) {
-      const { browserName } = browser.capabilities
-      const isIE = browserName === 'internet explorer'
-      const timestamp = +new Date()
-      const browserVariant = isIE ? `ie${browserVersion}` : browserName
-      const testTitle = encodeURIComponent(test.title.replace(/\s+/g, '-'))
-      const filename = `${this.screenshotPath}${timestamp}-${browserVariant}-${testTitle}.png`
-
-      try {
-        await browser.saveScreenshot(filename)
-        console.log(`Test failed, created: ${filename}`)
-      } catch (error) {
-        console.error(`Failed to save screenshot: ${error.message}`)
-      }
-    }
-  },
-
-  // Add hooks to ensure proper test setup/teardown in CI
-  before: async function (capabilities, specs) {
-    // Adding a small global pause to allow browser to fully initialize
-    if (isCI) {
-      console.log('Running in CI environment with extended timeouts')
-      await browser.pause(2000)
-    }
-  },
-
-  beforeTest: async function (test, context) {
-    if (isCI) {
-      // Add additional debugging info in CI
-      console.log(`Running test: ${test.title}`)
-    }
-  }
+  specs: [join(cwd(), 'test/integration/**/*.js')],
+  waitforTimeout: 30 * 10000
 }
+
+/**
+ * @typedef {import('@wdio/types').Options.Testrunner} Testrunner
+ * @typedef {import('@wdio/types').Capabilities.RemoteCapabilities} RemoteCapabilities
+ * @typedef {import('@wdio/static-server-service').StaticServerOptions} StaticServerOptions
+ * @typedef {import('@wdio/sauce-service').SauceServiceConfig} SauceServiceConfig
+ */

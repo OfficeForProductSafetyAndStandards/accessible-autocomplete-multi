@@ -1,58 +1,46 @@
 require('@babel/register')({
-  cwd: require('path').resolve(__dirname, '../')
+  rootMode: 'upward'
 })
+
 const puppeteer = require('puppeteer')
-const baseWebpackConfig = require('../webpack.config.babel.js')[0]
-const webpack = require('webpack')
-const path = require('path')
+const webpackConfig = require('../webpack.config.mjs')
+
+// Use Chrome headless
 process.env.CHROME_BIN = puppeteer.executablePath()
 
 module.exports = function (config) {
   config.set({
     basePath: '../',
-    frameworks: ['mocha', 'chai-sinon'],
+    frameworks: ['mocha', 'webpack'],
     reporters: ['mocha'],
-    browsers: ['ChromeHeadlessNoSandbox'],
-    customLaunchers: {
-      ChromeHeadlessNoSandbox: {
-        base: 'ChromeHeadless',
-        flags: ['--no-sandbox', '--disable-gpu']
-      }
-    },
+
+    browsers: ['ChromeHeadless'],
+
     files: [
       'test/functional/**/*.js'
     ],
+
     preprocessors: {
       'test/**/*.js': ['webpack'],
       'src/**/*.js': ['webpack'],
       '**/*.js': ['sourcemap']
     },
+
     webpack: {
-      ...baseWebpackConfig,
-      module: {
-        rules: [
-          ...(baseWebpackConfig.module?.rules || []),
-          {
-            test: /\.js$/,
-            include: [
-              path.resolve(__dirname, '../node_modules/chai')
-            ],
-            use: {
-              loader: 'babel-loader'
-            }
-          }
-        ]
-      },
-      plugins: [
-        ...(baseWebpackConfig.plugins || []),
-        new webpack.DefinePlugin({
-          'process.env.NODE_ENV': JSON.stringify('test')
-        })
-      ]
-    },
-    webpackMiddleware: {
-      logLevel: 'error',
-      stats: 'errors-only'
+      // Use standalone webpack config [0] rather
+      // than Preact [1] or React [2] configs
+      ...webpackConfig.default[0],
+
+      // Use Karma managed test entry points
+      entry: undefined,
+
+      // Use Karma default `os.tmpdir()` output
+      output: undefined,
+
+      // Suppress webpack performance warnings due to
+      // Karma chunked output and inline source maps
+      performance: { hints: false },
+      stats: { preset: 'errors-only' }
     }
   })
 }

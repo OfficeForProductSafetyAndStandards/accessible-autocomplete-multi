@@ -1,4 +1,6 @@
-/* global after, describe, before, beforeEach, expect, it */
+/* global after, describe, before, beforeEach, it */
+
+import { expect } from 'chai'
 import { createElement, render } from 'preact' /** @jsx createElement */
 import Autocomplete from '../../src/autocomplete'
 import Status from '../../src/status'
@@ -108,6 +110,104 @@ describe('Autocomplete', () => {
         })
       })
 
+      describe('menuAttributes', () => {
+        it('renders with extra attributes on the menu', () => {
+          render(<Autocomplete menuAttributes={{ 'data-test': 'test' }} id='autocomplete-default' />, scratch)
+
+          const wrapperElement = scratch.getElementsByClassName('autocomplete__wrapper')[0]
+          const dropdownElement = wrapperElement.getElementsByTagName('ul')[0]
+
+          expect(dropdownElement.getAttribute('data-test')).to.equal('test')
+        })
+
+        describe('attributes computed by the component', () => {
+          it('does not override attributes computed by the component', () => {
+            const menuAttributes = {
+              id: 'custom-id',
+              role: 'custom-role'
+            }
+
+            render(<Autocomplete menuAttributes={menuAttributes} id='autocomplete-default' />, scratch)
+
+            // Check that the computed values are the ones expected in the HTML
+            const menuElement = scratch.getElementsByClassName('autocomplete__menu')[0]
+            expect(menuElement.id).to.equal('autocomplete-default__listbox', 'HTML id')
+            expect(menuElement.role).to.equal('listbox', 'HTML role')
+
+            // Check that in protecting the menu, we don't affect the object passed as option
+            expect(menuAttributes.id).to.equal('custom-id', 'options id')
+            expect(menuAttributes.role).to.equal('custom-role', 'options role')
+          })
+        })
+
+        it('adds `className` to the computed value of the `class` attribute', () => {
+          const menuAttributes = {
+            className: 'custom-className'
+          }
+
+          render(<Autocomplete menuAttributes={menuAttributes} id='autocomplete-default' />, scratch)
+
+          // Check that the computed values are the ones expected in the HTML
+          const menuElement = scratch.getElementsByClassName('autocomplete__menu')[0]
+          expect(menuElement.getAttribute('class')).to.equal('autocomplete__menu autocomplete__menu--inline autocomplete__menu--hidden custom-className')
+
+          // Check that in protecting the menu, we don't affect the object passed as option
+          expect(menuAttributes.className).to.equal('custom-className')
+        })
+
+        // Align with Preact's behaviour where `class` takes precedence
+        it('adds `class` to the computed value of the `class` attribute, ignoring `className` if present', () => {
+          const menuAttributes = {
+            className: 'custom-className',
+            class: 'custom-class'
+          }
+
+          render(<Autocomplete menuAttributes={menuAttributes} id='autocomplete-default' />, scratch)
+
+          // Check that the computed values are the ones expected in the HTML
+          const menuElement = scratch.getElementsByClassName('autocomplete__menu')[0]
+          expect(menuElement.getAttribute('class')).to.equal('autocomplete__menu autocomplete__menu--inline autocomplete__menu--hidden custom-class')
+
+          // Check that in protecting the menu, we don't affect the object passed as option
+          expect(menuAttributes.className).to.equal('custom-className')
+          expect(menuAttributes.class).to.equal('custom-class')
+        })
+
+        it('adds `aria-labelledby` by default, based on the ID', () => {
+          render(<Autocomplete id='autocomplete-default' />, scratch)
+
+          const wrapperElement = scratch.getElementsByClassName('autocomplete__wrapper')[0]
+          const dropdownElement = wrapperElement.getElementsByTagName('ul')[0]
+
+          expect(dropdownElement.getAttribute('aria-labelledby')).to.equal('autocomplete-default')
+        })
+
+        it('overrides `aria-labelledby` if passed in menuAttributes', () => {
+          render(<Autocomplete menuAttributes={{ 'aria-labelledby': 'test' }} id='autocomplete-default' />, scratch)
+
+          const wrapperElement = scratch.getElementsByClassName('autocomplete__wrapper')[0]
+          const dropdownElement = wrapperElement.getElementsByTagName('ul')[0]
+
+          expect(dropdownElement.getAttribute('aria-labelledby')).to.equal('test')
+        })
+      })
+
+      it('renders with extra class on the input', () => {
+        render(<Autocomplete inputClasses='custom-class' id='autocomplete-default' />, scratch)
+
+        const inputElement = scratch.getElementsByClassName('autocomplete__input')[0]
+
+        expect(inputElement.getAttribute('class')).to.contain(' custom-class')
+      })
+
+      it('renders with extra class on the menu', () => {
+        render(<Autocomplete menuClasses='custom-class' id='autocomplete-default' />, scratch)
+
+        const menuElement = scratch.getElementsByClassName('autocomplete__menu')[0]
+
+        expect(menuElement.getAttribute('class')).to.contain('custom-class')
+      })
+
       it('renders with the correct roles', () => {
         render(<Autocomplete required />, scratch)
 
@@ -181,6 +281,12 @@ describe('Autocomplete', () => {
         autocomplete.setState({ query: 'f', options: ['France'], menuOpen: true })
         autocomplete.handleInputChange({ target: { value: '' } })
         expect(autocomplete.state.menuOpen).to.equal(false)
+      })
+
+      it('searches with the new term when query length changes', () => {
+        autocomplete.setState({ query: 'fr', options: ['France'] })
+        autocomplete.handleInputChange({ target: { value: 'fb' } })
+        expect(autocomplete.state.options.length).to.equal(0)
       })
 
       it('removes the aria-describedby attribute when query is non empty', () => {

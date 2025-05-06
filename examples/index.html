@@ -46,6 +46,21 @@
         max-width: 20em;
         margin-bottom: 4rem;
       }
+
+      /* Custom classes for the `XYZClasses` props with visual changes to see their effect without inspecting */ 
+      .app-input {
+        /* Adjust the font to check that both hint and input get the class by default,
+           to ensure the hint suggestion exactly aligns with the typed input text */
+        font-family: serif;
+      }
+
+      .app-hint {
+        box-shadow: inset 0 0 0 5px #44952e;
+      }
+
+      .custom-menu-class {
+        box-shadow: 0 3px 0 0 #fd0, 3px 3px 0 0 #fd0, -3px 3px 0 0 #fd0;
+      }
     </style>
     <link rel="stylesheet" href="../dist/accessible-autocomplete.min.css">
   </head>
@@ -121,6 +136,30 @@
       <label for="autocomplete-customDropdownArrow">Country</label>
       <div id="tt-customDropdownArrow" class="autocomplete-wrapper"></div>
 
+      <h3><code>{ inputClasses: 'app-input'}</code></h3>
+      <p>
+        The classes provided in <code>inputClasses</code> are added to
+        the component's <code>&lt;input&gt;</code>.
+      </p>
+      <label for="autocomplete-inputClasses">Country</label>
+      <div id="tt-inputClasses" class="autocomplete-wrapper"></div>
+
+      <h3><code>{ hintClasses: 'app-hint'}</code></h3>
+      <p>
+        The classes provided in <code>hintClasses</code> are added to
+        the component's hint that appears when the value matches the start of a suggestion.
+      </p>
+      <label for="autocomplete-hintClasses">Country</label>
+      <div id="tt-hintClasses" class="autocomplete-wrapper"></div>
+
+      <h3><code>{ menuClasses: 'custom-menu-class'}</code></h3>
+      <p>
+        The classes provided in <code>menuClasses</code> are added to
+        the menu displaying the suggestions.
+      </p>
+      <label for="autocomplete-menuClasses">Country</label>
+      <div id="tt-menuClasses" class="autocomplete-wrapper"></div>
+
       <h2>Advanced features</h2>
 
       <h3>Progressive enhancement</h3>
@@ -161,21 +200,6 @@
         tStatusResults: () => '' }</code> options.</p>
       <label for="autocomplete-i18n">Country</label>
       <div id="tt-i18n" class="autocomplete-wrapper"></div>
-
-      <h3>Multiselect</h3>
-      <p>
-        This example demonstrates how to use the autocomplete on a multiselect <code>&lt;select multiple&gt;</code> element
-        Turn off JavaScript to see the <code>&lt;select multiple&gt;</code> element.
-      </p>
-      <p>Uses <code>accessibleAutocomplete.enhanceSelectElement</code>.</p>
-      <label for="multiselect-autocomplete-progressiveEnhancement">Select your country</label>
-      <div class="autocomplete-wrapper">
-        <select multiple id="multiselect-autocomplete-progressiveEnhancement">
-          <option value="fr">France</option>
-          <option value="de" selected>Germany</option>
-          <option value="gb" selected>United Kingdom</option>
-        </select>
-      </div>
     </main>
 
     <script type="text/javascript" src="../dist/accessible-autocomplete.min.js"></script>
@@ -495,6 +519,42 @@
     </script>
 
     <script type="text/javascript">
+      element = document.querySelector('#tt-inputClasses')
+      id = 'autocomplete-inputClasses'
+      accessibleAutocomplete({
+        element: element,
+        id: id,
+        source: countries,
+        autoselect: true,
+        inputClasses: 'app-input'
+      })
+    </script>
+
+    <script type="text/javascript">
+      element = document.querySelector('#tt-hintClasses')
+      id = 'autocomplete-hintClasses'
+      accessibleAutocomplete({
+        element: element,
+        id: id,
+        source: countries,
+        autoselect: true,
+        hintClasses: 'app-hint'
+      })
+    </script>
+
+    <script type="text/javascript">
+      element = document.querySelector('#tt-menuClasses')
+      id = 'autocomplete-menuClasses'
+      accessibleAutocomplete({
+        element: element,
+        id: id,
+        source: countries,
+        autoselect: true,
+        menuClasses: 'custom-menu-class'
+      })
+    </script>
+
+    <script type="text/javascript">
       element = document.querySelector('#autocomplete-progressiveEnhancement')
       accessibleAutocomplete.enhanceSelectElement({
         selectElement: element
@@ -547,7 +607,7 @@
         element: element,
         id: id,
         confirmOnBlur: false,
-        source: countries
+        source: countries,
       })
     </script>
 
@@ -558,7 +618,7 @@
         element: element,
         id: id,
         placeholder: 'Search for a country',
-        source: countries
+        source: countries,
       })
     </script>
 
@@ -626,14 +686,6 @@
         dropdownArrow: function (config) {
           return '<svg class="' + config.className + '" style="top: 8px;" viewBox="0 0 512 512" ><path d="M256,298.3L256,298.3L256,298.3l174.2-167.2c4.3-4.2,11.4-4.1,15.8,0.2l30.6,29.9c4.4,4.3,4.5,11.3,0.2,15.5L264.1,380.9  c-2.2,2.2-5.2,3.2-8.1,3c-3,0.1-5.9-0.9-8.1-3L35.2,176.7c-4.3-4.2-4.2-11.2,0.2-15.5L66,131.3c4.4-4.3,11.5-4.4,15.8-0.2L256,298.3  z"/></svg>'
         }
-      })
-    </script>
-
-    <script type="text/javascript">
-      element = document.querySelector('#multiselect-autocomplete-progressiveEnhancement')
-      accessibleAutocomplete.enhanceSelectElement({
-        minLength: 3,
-        selectElement: element
       })
     </script>
 
