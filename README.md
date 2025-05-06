@@ -1,14 +1,11 @@
-# Accessible autocomplete
+# Accessible autocomplete multi
+
+> This is a fork of the original [accessible autocomplete](https://github.com/alphagov/accessible-autocomplete) component, adding support for multi-select autocomplete components.
+> It is similar to [accessible autocomplete multiselect](https://github.com/alphagov/accessible-autocomplete-multiselect) but up-to-date with the latest version of the accessible autocomplete component as of May 2025 (v3.0.1).
 
 The accessible autocomplete is a component that helps users choose answers from a list you provide. You can also use it to make the answers you get from users more consistent.
 
 If you're asking users to provide their country or territory, the [govuk-country-and-territory-autocomplete](https://github.com/alphagov/govuk-country-and-territory-autocomplete/blob/main/README.md) might be more appropriate.
-
-[![npm version](https://img.shields.io/npm/v/accessible-autocomplete.svg)](http://npm.im/accessible-autocomplete)
-[![JavaScript Style Guide](https://img.shields.io/badge/code_style-standard-brightgreen.svg)](https://standardjs.com)
-[![gzip size](http://img.badgesize.io/https://unpkg.com/accessible-autocomplete/dist/accessible-autocomplete.min.js?compression=gzip)](https://unpkg.com/accessible-autocomplete/dist/accessible-autocomplete.min.js)
-
-[![Sauce Labs Build Status](https://saucelabs.com/browser-matrix/tvararu-alphagov.svg)](https://saucelabs.com/u/tvararu-alphagov)
 
 `accessible-autocomplete` is a JavaScript autocomplete built from the ground up to be accessible. The design goals are:
 
@@ -16,17 +13,13 @@ If you're asking users to provide their country or territory, the [govuk-country
 - **User experience**: Supporting a wide variety of user needs.
 - **Compatibility**: Working with [recommended browsers](https://www.gov.uk/service-manual/technology/designing-for-different-browsers-and-devices#browsers-to-test-in) and [assistive technologies](https://www.gov.uk/service-manual/technology/testing-with-assistive-technologies#which-assistive-technologies-to-test-with).
 
-[Try out the examples!](https://alphagov.github.io/accessible-autocomplete/examples/)
+[Try out the examples!](https://officeforproductsafetyandstandards.github.io/accessible-autocomplete-multi/examples/)
 
 ---
 
 ## Support
 
-The GOV.UK Design System team maintains the accessible autocomplete as a standalone component. However, we’re only able to put in minimal work to support it.
-
-[Read about our plans to maintain this component](https://github.com/alphagov/accessible-autocomplete/issues/532).
-
-[Read more about the types of support we can provide](https://github.com/alphagov/accessible-autocomplete/issues/430).
+There is no formal support for this fork. However, some support may be provided on a best-efforts basis based on GitHub issues.
 
 ---
 
@@ -66,6 +59,8 @@ accessibleAutocomplete({
 ```
 
 If you want to use it as a replacement for a `<select>` element, read the [Progressive enhancement](#progressive-enhancement) section.
+
+If your `<select>` element has the `multiple` attribute, the autocomplete component will automatically become a multi-select autocomplete component.
 
 ### As a plain JavaScript module
 
@@ -115,9 +110,9 @@ preact.render(
 
 Preact v8.5.3 has been tested to work with the Accessible Autocomplete - although make sure to check out [documented issues](https://github.com/alphagov/accessible-autocomplete/issues).
 
-Preact 10.19.6 has been incompletely tested with the Accessible Autocomplete. No issues were found in Chrome and Firefox, but our automated tests for picking an option using the keyboard failed in Internet Explorer 11 (an issue we could not replicate when testing manually, though). 
+Preact 10.19.6 has been incompletely tested with the Accessible Autocomplete. No issues were found in Chrome and Firefox, but our automated tests for picking an option using the keyboard failed in Internet Explorer 11 (an issue we could not replicate when testing manually, though).
 
-We recommend you carry out thorough testing if you wish to use this or later versions of Preact. 
+We recommend you carry out thorough testing if you wish to use this or later versions of Preact.
 
 ### Using with React
 
@@ -482,8 +477,6 @@ accessibleAutocomplete({
 ## Developing locally
 
 Check out the [CONTRIBUTING](CONTRIBUTING.md) guide for instructions.
-
-If you want to help and want to get more familiar with the codebase, try starting with the ["good for beginners"](https://github.com/alphagov/accessible-autocomplete/issues?q=is%3Aissue+is%3Aopen+label%3A%22good+for+beginners%22) issues.
 
 ## License
 

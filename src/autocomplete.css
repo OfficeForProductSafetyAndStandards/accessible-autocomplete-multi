@@ -165,3 +165,46 @@
     line-height: 1.3157894737;
   }
 }
+
+.autocomplete__list {
+  list-style-type: none;
+  padding: 0;
+  margin: 20px 0 0;
+}
+
+.autocomplete__list .autocomplete__selected-option,
+.autocomplete__list .autocomplete__selected-option:hover {
+  cursor: inherit;
+  color: #0b0c0c;
+  margin: 5px 0;
+}
+
+.autocomplete__list .autocomplete__remove-option {
+  cursor: pointer;
+  color: #005ea5;
+  text-decoration: underline;
+  background: transparent;
+  border: none;
+  font-size: inherit;
+  margin-left: 5px;
+}
+
+.autocomplete__list .autocomplete__remove-option:hover{
+  color: #2b8cc4;
+}
+
+.autocomplete__list .autocomplete__remove-option:focus{
+  color: #0b0c0c;
+  outline: 3px solid #ffbf47;
+  outline-offset: 0;
+  background-color: #ffbf47;
+}
+
+.autocomplete__list .autocomplete__remove-option:before {
+  content: '× ';
+  color: inherit;
+}
+
+.autocomplete__list-item-description {
+  display: none;
+}
